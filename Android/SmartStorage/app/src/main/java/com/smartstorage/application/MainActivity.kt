@@ -15,14 +15,25 @@ class MainActivity : ComponentActivity() {
     private var listView : ListView? = null
     private var adapter : ListViewAdapter? = null
 
+    private var maxRow = 3
+    private var maxColumn = 4
+
+    private var outputRow = 2
+    private var outputColumn = 2
+
+    private var isEmpty = Array(maxRow) {
+        Array(maxColumn) {
+            true
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        USBHandler.createInstance(applicationContext)
+        isEmpty[outputRow][outputColumn]=false
 
-        items.add(Item(0,0,"0,0","a"))
-        items.add(Item(1,1,"1,1","b"))
+        //USBHandler.createInstance(applicationContext)
 
         listView = findViewById(R.id.listview)
         val input : EditText = findViewById(R.id.input)
@@ -31,7 +42,7 @@ class MainActivity : ComponentActivity() {
         listView?.adapter = adapter
 
         listView?.setOnItemClickListener{ _, _, position, _ ->
-            makeToast(items[position].name)
+            makeToast("${items[position].row}, ${items[position].column}")
         }
 
         listView?.setOnItemLongClickListener{ _, _, _, _ ->
@@ -43,9 +54,16 @@ class MainActivity : ComponentActivity() {
             if (text.isEmpty())
                 makeToast("Enter an item")
             else {
-                addItem(Item(1,1,text,text))
-                input.setText("")
-                makeToast("Item added")
+                val position = getPositionToStore()
+                if (position != null) {
+                    isEmpty[position.first][position.second] = false
+                    addItem(Item(position.first,position.second,text,text))
+                    input.setText("")
+                    makeToast("Item added")
+                } else {
+                    makeToast("No Empty Slots")
+                }
+
             }
         }
 
@@ -60,6 +78,49 @@ class MainActivity : ComponentActivity() {
         t?.cancel()
         t = Toast.makeText(applicationContext, s, Toast.LENGTH_LONG)
         t?.show()
+    }
+
+    private fun getPositionToStore() : Pair<Int,Int>?{
+        var position : Pair<Int,Int>? = null
+        var currentRow = maxRow-1
+        while (position==null && currentRow>=0) {
+            val position1 = getPositionToStoreLeft(currentRow, outputColumn - 1)
+            val position2 = getPositionToStoreRight(currentRow, outputColumn)
+            if (position1 != null && position2 != null)
+                if (outputColumn - position1.second <= position2.second - outputColumn)
+                    position = position1
+                else
+                    position = position2
+            else
+                if (position1 != null)
+                    position = position1
+                else
+                    if (position2 != null)
+                        position = position2
+                    else
+                        currentRow--
+        }
+        return position
+    }
+
+    private fun getPositionToStoreLeft(x: Int, y: Int) : Pair<Int,Int>?{
+        if(isEmpty[x][y])
+            return Pair(x,y)
+        else
+            if(y==0)
+                return null
+            else
+                return getPositionToStoreLeft(x,y-1)
+    }
+
+    private fun getPositionToStoreRight(x: Int, y: Int) : Pair<Int,Int>?{
+        if(isEmpty[x][y])
+            return Pair(x,y)
+        else
+            if(y==(maxColumn-1))
+                return null
+            else
+                return getPositionToStoreLeft(x,y+1)
     }
 
 }
