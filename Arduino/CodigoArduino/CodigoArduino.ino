@@ -20,7 +20,7 @@ const int firstShelfHeight = 0;
 
 //Column and Row start at 0
 const int MaxColumn = 3;
-const int MaxRow = 3;
+const int MaxRow = 2;
 
 const int endstopX = 11;  // x era 9
 const int endstopY = 9;   // y era 10
@@ -80,12 +80,12 @@ void moveStepper(AccelStepper* stepper, int distance) {
 
 void moveCurrentTrayToPosition(int row, int column) {
   moveStepperToPosition(&stepperY, lengthToStepsRod(YRodLenght));
-  moveStepper(&stepperZ, 2*stepsPerRevolution);
+  moveStepper(&stepperZ, 3*stepsPerRevolution);
   moveStepperToPosition(&stepperY, 0);
   moveStepperToPosition(&stepperX, lengthToStepsBelt((column * shelfLength) / MaxColumn));
-  moveStepperToPosition(&stepperZ, lengthToStepsRod(firstShelfHeight + row * shelfHeight + 2*stepsPerRevolution));
+  moveStepperToPosition(&stepperZ, lengthToStepsRod(firstShelfHeight + row * shelfHeight)+2*stepsPerRevolution);
   moveStepperToPosition(&stepperY, lengthToStepsRod(YRodLenght));
-  moveStepper(&stepperZ, -2*stepsPerRevolution);
+  moveStepper(&stepperZ, -3*stepsPerRevolution);
   moveStepperToPosition(&stepperY, 0);
 }
 
@@ -96,7 +96,7 @@ void goToCell(int row, int column) {
 
 void setup() {
   Serial.begin(9600);
-  Serial.setTimeout(50);
+  Serial.setTimeout(100);
   pinMode(enablePin, OUTPUT);
   digitalWrite(enablePin, HIGH);
 
@@ -106,15 +106,15 @@ void setup() {
 
   initializeStepper(&stepperY, endstopY, 800, 75);
   stepperY.setMaxSpeed(1250);
-  stepperY.setAcceleration(25000);
+  stepperY.setAcceleration(6000);
 
   initializeStepper(&stepperX, endstopX, 400, 50);
   stepperX.setMaxSpeed(1000);
-  stepperX.setAcceleration(20000);
+  stepperX.setAcceleration(5000);
 
   initializeStepper(&stepperZ, endstopZ, 800, 200);
   stepperZ.setMaxSpeed(1250);
-  stepperZ.setAcceleration(25000);
+  stepperZ.setAcceleration(6000);
 }
 
 bool checkMessage(int command,int row,int column,int check){
@@ -135,7 +135,7 @@ void loop() {
   row = Serial.read();
   column = Serial.read();
   check = Serial.read();
-
+  
   //1 ACK CONFIRMACION
 
 
@@ -166,8 +166,13 @@ void loop() {
       if(check == 10)
         Serial.print(2);
       else
-        Serial.print(3);
+          Serial.print(3);
     }
 
   }
+  
+  while(Serial.available() > 0) {
+    char t = Serial.read();
+  }
+
 }

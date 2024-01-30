@@ -11,10 +11,8 @@ import android.widget.TextView
 import android.widget.Toast
 import com.hoho.android.usbserial.driver.UsbSerialPort
 
-class ListViewAdapter(context : Context, items : ArrayList<Item>) : ArrayAdapter<Item>(context, R.layout.list_row, items) {
+class ListViewAdapter(private val context : Context, private val items : ArrayList<Item>, private val outputCell : Pair<Int,Int>, private val emptyCell : IntArray, private val isAvailable : Array<Array<Boolean>>) : ArrayAdapter<Item>(context, R.layout.list_row, items) {
 
-    private var items : ArrayList<Item>? = items
-    private var context : Context? = context
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         var view = convertView
@@ -37,7 +35,15 @@ class ListViewAdapter(context : Context, items : ArrayList<Item>) : ArrayAdapter
 
 
         retrieve.setOnClickListener {
-            val message = items?.removeAt(position)?.retrieve()
+            var check = 1+outputCell.first+outputCell.second
+            USBHandler.getInstance()?.sendMessage(byteArrayOf(1,outputCell.first.toByte(),outputCell.second.toByte(),check.toByte()))
+            println("${emptyCell[0]} ${emptyCell[1]}")
+            check = 2+emptyCell[0]+ emptyCell[1]
+            USBHandler.getInstance()?.sendMessage(byteArrayOf(2,emptyCell[0].toByte(),emptyCell[1].toByte(),check.toByte()))
+            isAvailable[items[position].row][items[position].column] = true
+            emptyCell[0]=items[position].row
+            emptyCell[1]=items[position].column
+            val message = items.removeAt(position).retrieve(outputCell)
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             notifyDataSetChanged()
         }

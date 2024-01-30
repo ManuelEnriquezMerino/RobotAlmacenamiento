@@ -63,27 +63,30 @@ class USBHandler private constructor(){
 
         if(port != null){
             while(read[0].toInt()-48 != 1 ){
-                println("1: "+read[0])
-                try {port!!.write(message,100)} catch (e : Exception) {println(e.message)}
-                try {port!!.read(read, 100)  } catch (e : Exception) {println(e.message)}
-                if(read[0].toInt()-48 == 3 ){
-                    port!!.write(byteArrayOf(11),100)
-                }
+                read[0]=0
+
+                try {
+                    port!!.read(read, 100)
+                    if(read[0].toInt()-48 == 3 ){
+                        port!!.write(byteArrayOf(11),500)
+                    } else {
+                        port!!.write(message, 10)
+                    }
+                } catch (e : Exception) {println(e.message)}
+
             }
 
             while(read[0].toInt()-48 != 2 ){
                 try {port!!.read(read, 100)  } catch (e : Exception) {println(e.message)}
-                println("2: " + read[0])
-                try {port!!.write(byteArrayOf(10),100)} catch (e : Exception) {println(e.message)}
+                try {port!!.write(byteArrayOf(10),50)} catch (e : Exception) {println(e.message)}
             }
 
             while(read[0].toInt()-48 != 3 ){
                 try {port!!.read(read, 100)  } catch (e : Exception) {println(e.message)}
-                println("3: " + read[0])
                 if(read[0].toInt()-48 == 1 )
-                    try {port!!.write(byteArrayOf(10),100)} catch (e : Exception) {println(e.message)}
+                    try {port!!.write(byteArrayOf(10),10)} catch (e : Exception) {println(e.message)}
                 else
-                    try {port!!.write(byteArrayOf(11),100)} catch (e : Exception) {println(e.message)}
+                    try {port!!.write(byteArrayOf(11),10)} catch (e : Exception) {println(e.message)}
 
             }
             return true

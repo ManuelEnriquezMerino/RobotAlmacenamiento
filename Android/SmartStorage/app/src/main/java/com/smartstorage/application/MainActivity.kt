@@ -15,14 +15,16 @@ class MainActivity : ComponentActivity() {
     private var listView : ListView? = null
     private var adapter : ListViewAdapter? = null
 
-    private var maxRow = 3
-    private var maxColumn = 4
+    private var maxRow = 2
+    private var maxColumn = 3
 
-    private var outputRow = 2
-    private var outputColumn = 2
+    private var outputCell = Pair(2,2) //Row,Column
 
-    private var isEmpty = Array(maxRow) {
-        Array(maxColumn) {
+    private var emptyCell = intArrayOf(2,0)
+
+
+    private var isAvailable = Array(maxRow+1) {
+        Array(maxColumn+1) {
             true
         }
     }
@@ -31,14 +33,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        isEmpty[outputRow][outputColumn]=false
+        isAvailable[outputCell.first][outputCell.second]=false
+        isAvailable[emptyCell[0]][emptyCell[1]]=false
 
         //USBHandler.createInstance(applicationContext)
 
         listView = findViewById(R.id.listview)
         val input : EditText = findViewById(R.id.input)
         val add : ImageView = findViewById(R.id.add)
-        adapter = ListViewAdapter(applicationContext,items)
+        adapter = ListViewAdapter(applicationContext,items,outputCell,emptyCell,isAvailable)
         listView?.adapter = adapter
 
         listView?.setOnItemClickListener{ _, _, position, _ ->
@@ -54,12 +57,20 @@ class MainActivity : ComponentActivity() {
             if (text.isEmpty())
                 makeToast("Enter an item")
             else {
-                val position = getPositionToStore()
-                if (position != null) {
-                    isEmpty[position.first][position.second] = false
-                    addItem(Item(position.first,position.second,text,text))
-                    input.setText("")
+                if(emptyCell!=null){
+                    var check = 1+outputCell.first+outputCell.second
+                    USBHandler.getInstance()?.sendMessage(byteArrayOf(1,outputCell.first.toByte(),outputCell.second.toByte(),check.toByte()))
+                    addItem(Item(emptyCell,text,text))
+                    isAvailable[emptyCell[0]][emptyCell[1]] = false
                     makeToast("Item added")
+                    updateEmptyCell()
+                    println("${emptyCell[0]} ${emptyCell[1]}")
+                    if(emptyCell!=null){
+                        check = 1+emptyCell[0]+emptyCell[1]
+                        USBHandler.getInstance()?.sendMessage(byteArrayOf(1,emptyCell[0].toByte(),emptyCell[1].toByte(),check.toByte()))
+                        check = 2+outputCell.first+outputCell.second
+                        USBHandler.getInstance()?.sendMessage(byteArrayOf(2,outputCell.first.toByte(),outputCell.second.toByte(),check.toByte()))
+                    }
                 } else {
                     makeToast("No Empty Slots")
                 }
@@ -80,14 +91,14 @@ class MainActivity : ComponentActivity() {
         t?.show()
     }
 
-    private fun getPositionToStore() : Pair<Int,Int>?{
+    private fun updateEmptyCell() {
         var position : Pair<Int,Int>? = null
-        var currentRow = maxRow-1
+        var currentRow = maxRow
         while (position==null && currentRow>=0) {
-            val position1 = getPositionToStoreLeft(currentRow, outputColumn - 1)
-            val position2 = getPositionToStoreRight(currentRow, outputColumn)
+            val position1 = getPositionToStoreLeft(currentRow, outputCell.second - 1)
+            val position2 = getPositionToStoreRight(currentRow, outputCell.second)
             if (position1 != null && position2 != null)
-                if (outputColumn - position1.second <= position2.second - outputColumn)
+                if (outputCell.second - position1.second <= position2.second - outputCell.second)
                     position = position1
                 else
                     position = position2
@@ -100,11 +111,14 @@ class MainActivity : ComponentActivity() {
                     else
                         currentRow--
         }
-        return position
+        if (position != null) {
+            emptyCell[0]=position.first
+            emptyCell[1]=position.second
+        }
     }
 
     private fun getPositionToStoreLeft(x: Int, y: Int) : Pair<Int,Int>?{
-        if(isEmpty[x][y])
+        if(isAvailable[x][y])
             return Pair(x,y)
         else
             if(y==0)
@@ -114,10 +128,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun getPositionToStoreRight(x: Int, y: Int) : Pair<Int,Int>?{
-        if(isEmpty[x][y])
+        if(isAvailable[x][y])
             return Pair(x,y)
         else
-            if(y==(maxColumn-1))
+            if(y==(maxColumn))
                 return null
             else
                 return getPositionToStoreLeft(x,y+1)
