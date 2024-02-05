@@ -2,6 +2,8 @@ package com.smartstorage.application
 
 import android.app.Activity
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,9 +11,10 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import com.hoho.android.usbserial.driver.UsbSerialPort
+import com.google.gson.Gson
 
-class ListViewAdapter(private val context : Context, private val items : ArrayList<Item>, private val outputCell : Pair<Int,Int>, private val emptyCell : IntArray, private val isAvailable : Array<Array<Boolean>>) : ArrayAdapter<Item>(context, R.layout.list_row, items) {
+
+class ListViewAdapter(private val context : Context) : ArrayAdapter<Item>(context, R.layout.list_row, ItemHandler.getItemList()) {
 
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -22,30 +25,29 @@ class ListViewAdapter(private val context : Context, private val items : ArrayLi
             view = layoutInflater.inflate(R.layout.list_row,null)
         }
         val number : TextView = view!!.findViewById(R.id.number)
-        number.text = "${position + 1}."
+        number.text = (position+1).toString()
 
         val name : TextView = view.findViewById(R.id.name)
-        name.text = "${items?.get(position)?.name}"
+        name.text = ItemHandler.getItem(position).name
 
-        val info : ImageView = view.findViewById(R.id.info)
+        //val info : ImageView = view.findViewById(R.id.info)
         val retrieve : ImageView = view.findViewById(R.id.retrieve)
 
-        info.setOnClickListener {}
+        //info.setOnClickListener {}
 
 
 
         retrieve.setOnClickListener {
-            var check = 1+outputCell.first+outputCell.second
-            USBHandler.getInstance()?.sendMessage(byteArrayOf(1,outputCell.first.toByte(),outputCell.second.toByte(),check.toByte()))
-            println("${emptyCell[0]} ${emptyCell[1]}")
-            check = 2+emptyCell[0]+ emptyCell[1]
-            USBHandler.getInstance()?.sendMessage(byteArrayOf(2,emptyCell[0].toByte(),emptyCell[1].toByte(),check.toByte()))
-            isAvailable[items[position].row][items[position].column] = true
-            emptyCell[0]=items[position].row
-            emptyCell[1]=items[position].column
-            val message = items.removeAt(position).retrieve(outputCell)
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            ItemHandler.retrieveItem(position)
             notifyDataSetChanged()
+            /*val convertedDataItems: String = Gson().toJson(items)
+            val convertedDataEmptyCell: String = Gson().toJson(emptyCell)
+            val convertedDataIsAvailable: String = Gson().toJson(isAvailable)
+            val editor = context.getSharedPreferences(context.resources.getString(R.string.file),MODE_PRIVATE).edit()
+            editor.putString("items",convertedDataItems)
+            editor.putString("emptyCell",convertedDataEmptyCell)
+            editor.putString("isAvailable",convertedDataIsAvailable)
+            editor.apply()*/
         }
 
         return view

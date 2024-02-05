@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/popUpWindow"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="16dp"
+    android:background="@drawable/layout_bg"
+>
+    <EditText
+        android:layout_width="match_parent"
+        android:background="#d8dadf"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/name"
+        android:layout_marginBottom="50dp"
+        android:id="@+id/inputName"
+        />
+
+    <EditText
+        android:id="@+id/inputDescription"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:layout_below="@id/inputName"
+        android:layout_centerInParent="true"
+        android:background="#d8dadf"
+        android:ems="10"
+        android:gravity="top"
+        android:hint="@string/description" />
+
+    <ImageView
+        android:id="@+id/cancel_item"
+        android:layout_width="50sp"
+        android:layout_height="50sp"
+        android:layout_marginStart="75dp"
+        android:layout_marginBottom="25dp"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/cancel_item" >
+    </ImageView>
+
+    <ImageView
+        android:id="@+id/add_item"
+        android:layout_width="50sp"
+        android:layout_height="50sp"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:layout_marginEnd="75dp"
+        android:layout_marginBottom="25dp"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/confirm_item" />
+</RelativeLayout>

@@ -5,13 +5,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:background="#282c34"
+    tools:context=".MainActivity"
+    android:elevation="1dp"
+    android:clipToPadding="false">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:id="@+id/header"
-        android:background="#F1FEFF"
+        android:background="#35383d"
+        android:elevation="10dp"
         >
         <EditText
             android:layout_width="wrap_content"
@@ -20,6 +24,7 @@
             android:hint="Enter item here"
             android:layout_centerInParent="true"
             android:id="@+id/input"
+            android:textColor="#bbb7aa"
         />
         <ImageView
             android:layout_width="40sp"
@@ -32,11 +37,20 @@
         />
     </RelativeLayout>
 
-    <ListView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/listview"
+        android:layout_height="match_parent"
+        android:id="@+id/list"
         android:layout_below="@id/header"
-    ></ListView>
+        android:paddingVertical="25dp"
+        android:paddingHorizontal="15dp"
+        >
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/listview"
+            android:divider="#282c34"
+            android:dividerHeight="10sp" />
+    </RelativeLayout>
 
 </RelativeLayout>

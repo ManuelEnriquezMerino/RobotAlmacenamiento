@@ -2,16 +2,19 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    android:background="@drawable/listitem_bg">
 
     <TextView
         android:id="@+id/number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/name"
+        android:layout_centerVertical="true"
         android:layout_marginBottom="2sp"
-        android:textColor="#A9E0F4"
+        android:layout_marginStart="5sp"
+        android:textColor="@color/black"
         android:textStyle="bold"
+        android:textSize="20sp"
     />
 
     <TextView
@@ -19,25 +22,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginStart="28sp"
-        android:textColor="#000"
-        android:textSize="20sp"
+        android:layout_marginBottom="15sp"
+        android:layout_marginStart="30sp"
+        android:textColor="@color/black"
+        android:textSize="35sp"
+        android:paddingBottom="5sp"
     />
-
-    <ImageView
-        android:id="@+id/info"
-        android:layout_width="22sp"
-        android:layout_height="22sp"
-        android:layout_centerVertical="true"
-        android:layout_toStartOf="@+id/retrieve"
-        android:layout_marginEnd="18sp"
-        android:src="@drawable/info"
-    />
-
+    <!--
+        <ImageView
+            android:id="@+id/info"
+            android:layout_width="22sp"
+            android:layout_height="22sp"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/retrieve"
+            android:layout_marginEnd="18sp"
+            android:src="@drawable/info"
+        />
+    -->
     <ImageView
         android:id="@+id/retrieve"
-        android:layout_width="22sp"
-        android:layout_height="22sp"
+        android:layout_width="33sp"
+        android:layout_height="33sp"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:layout_marginEnd="18sp"
